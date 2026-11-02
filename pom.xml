@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.nn0101</groupId>
+    <artifactId>api-spec-store</artifactId>
+    <packaging>pom</packaging>
+    <version>${revision}</version>
+    <name>SPEC-STORE</name>
+
+    <modules>
+        <module>spec-store-core</module>
+    </modules>
+
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.1</version>
+    </parent>
+
+    <properties>
+        <!-- 版本配置 Begin -->
+        <revision>1.0.0</revision>
+        <!-- 版本配置 End -->
+
+        <!-- 基础环境配置 Begin -->
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 基础环境配置 End -->
+
+        <!-- Maven插件版本 Begin -->
+        <maven_compiler_plugin.version>3.12.0</maven_compiler_plugin.version>
+        <!-- surefire 2.x 不识别 JUnit 5，会导致 @Test 被静默跳过；3.x 才支持 Jupiter -->
+        <maven_surefire_plugin.version>3.2.5</maven_surefire_plugin.version>
+        <!-- Maven插件版本 End -->
+
+        <!-- 核心框架版本 Begin -->
+        <spring-boot.version>4.1.1</spring-boot.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <spring-cloud-alibaba.version>2023.0.3.4</spring-cloud-alibaba.version>
+        <!-- 核心框架版本 End -->
+
+        <!-- Agent Scope 版本 Begin -->
+        <agentscope.version>2.0.4</agentscope.version>
+        <!-- Agent Scope 版本 Begin -->
+
+        <!-- Spring Security 版本 Begin -->
+        <spring-security-oauth2-authorization-server.version>1.4.3</spring-security-oauth2-authorization-server.version>
+        <spring-security-cas.version>6.2.4</spring-security-cas.version>
+        <!-- Spring Security 版本 End -->
+
+        <!-- 数据校验版本 Begin -->
+        <jakarta_validation.version>3.0.2</jakarta_validation.version>
+        <!-- 数据校验版本 End -->
+
+        <!-- 数据库相关版本 Begin -->
+        <postgresql.version>42.7.3</postgresql.version>
+        <druid.version>1.2.28</druid.version>
+        <druid-spring-boot-3-starter.version>1.2.28</druid-spring-boot-3-starter.version>
+        <sharding-jdbc.version>5.5.1</sharding-jdbc.version>
+        <antlr4-runtime.version>4.10.1</antlr4-runtime.version>
+        <!-- 数据库相关版本 End -->
+
+        <!-- ORM框架版本 Begin -->
+        <mybatis.version>4.1.0</mybatis.version>
+        <mybatis-plus.version>3.5.18.1</mybatis-plus.version>
+        <!-- ORM框架版本 End -->
+
+        <!-- 安全加密版本 Begin -->
+        <jasypt.version>3.0.3</jasypt.version>
+        <!-- 安全加密版本 End -->
+
+        <!-- 日志相关版本 Begin -->
+        <tlog-all-spring-boot-starter.version>1.5.2</tlog-all-spring-boot-starter.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <!-- 日志相关版本 End -->
+
+        <!-- Netty 版本 Begin -->
+        <netty-all.version>4.1.125.Final</netty-all.version>
+        <!-- Netty 版本 End -->
+
+        <!-- 通用工具类版本 Begin -->
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <lombok.version>1.18.46</lombok.version>
+        <fastjson.version>2.0.53</fastjson.version>
+        <hutool.version>5.8.42</hutool.version>
+        <aspectjweaver.version>1.9.7</aspectjweaver.version>
+        <commons-collections4.version>4.5.0-M3</commons-collections4.version>
+        <!-- 通用工具类版本 End -->
+    </properties>
+
+    <!-- ============================================ -->
+    <!-- 版本管理：统一控制所有依赖的版本号          -->
+    <!-- 子模块引入这些依赖时无需指定版本            -->
+    <!-- ============================================ -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Agent Scope Begin -->
+            <dependency>
+                <groupId>io.agentscope</groupId>
+                <artifactId>agentscope-harness</artifactId>
+                <version>${agentscope.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.agentscope</groupId>
+                <artifactId>agentscope-extensions-model-openai</artifactId>
+                <version>${agentscope.version}</version>
+            </dependency>
+            <!-- Agent Scope End -->
+
+            <!-- Spring Cloud Begin -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Cloud End -->
+
+            <!-- Aop Begin -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectjweaver.version}</version>
+            </dependency>
+            <!-- Aop End -->
+
+            <!-- 数据库相关 Begin -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+            <!--
+                只引 druid 核心包，不使用 druid-spring-boot-3-starter：
+                该 starter 的自动配置依赖 org.springframework.boot.autoconfigure.jdbc.DataSourceProperties，
+                该类在 Spring Boot 4 中已迁移到 org.springframework.boot.jdbc.autoconfigure，
+                直接引用会导致启动时 ClassNotFoundException。本项目数据源完全手写装配，无需该 starter。
+            -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-jdbc</artifactId>
+                <version>${sharding-jdbc.version}</version>
+            </dependency>
+            <!-- AES 加密算法实现（CryptographicAlgorithm SPI），shardingsphere-jdbc 不传递 -->
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-infra-algorithm-cryptographic-aes</artifactId>
+                <version>${sharding-jdbc.version}</version>
+            </dependency>
+            <!-- 读写分离轮询负载均衡算法（LoadBalanceAlgorithm SPI），shardingsphere-jdbc 不传递 -->
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-infra-algorithm-load-balancer-round-robin</artifactId>
+                <version>${sharding-jdbc.version}</version>
+            </dependency>
+            <!-- 数据库相关 End -->
+
+            <!-- ORM 框架 Begin -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!-- ORM 框架 End -->
+
+            <!-- Logstash Begin -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.version}</version>
+            </dependency>
+            <!-- Logstash End -->
+
+            <!-- Jasypt 加密 Begin -->
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt.version}</version>
+            </dependency>
+            <!-- Jasypt 加密 End -->
+
+            <!-- Validation 参数校验 Begin -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-validation</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${jakarta_validation.version}</version>
+            </dependency>
+            <!-- Validation 参数校验 End -->
+
+            <!-- Netty Begin -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty-all.version}</version>
+            </dependency>
+            <!-- Netty End -->
+
+            <!-- ========== 通用工具类（按需引入） Begin ========== -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <!-- ========== 通用工具类（按需引入） End ========== -->
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ============================================ -->
+    <!-- 全局依赖：仅保留所有模块100%都需要的       -->
+    <!-- ============================================ -->
+    <dependencies>
+        <!-- Lombok：所有模块都需要，且scope=provided不影响传递 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- SLF4J 日志门面：所有模块都需要打日志 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven_compiler_plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <release>${java.version}</release>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven_surefire_plugin.version}</version>
+                <configuration>
+                    <parallel>classes</parallel>
+                    <threadCount>10</threadCount>
+                    <systemPropertyVariables>
+                        <jacoco-agent.destfile>${project.build.directory}/coverage.exec</jacoco-agent.destfile>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profileActive>dev</profileActive>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <profileActive>test</profileActive>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profileActive>prod</profileActive>
+            </properties>
+        </profile>
+    </profiles>
+</project>

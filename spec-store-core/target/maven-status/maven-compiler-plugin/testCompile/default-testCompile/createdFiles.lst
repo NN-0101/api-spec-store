@@ -1,0 +1,3 @@
+com\nn0101\specstore\core\config\jdbc\PostgresqlAesEncryptAlgorithmTest.class
+com\nn0101\specstore\core\config\jdbc\ShardingSphereDataSourceTest.class
+com\nn0101\specstore\core\config\jdbc\ShardingSplitTest.class

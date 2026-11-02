@@ -1,0 +1,114 @@
+# ============================================================================
+# 开发环境：本地 PostgreSQL 17（localhost:5432，root/123456，库 spec_store）
+#
+# 使用 ShardingSphere 5.5.1 的三项能力，其中分库分表默认关闭：
+#   1) 读写分离：每个“读写分离组”= 主库 + 若干从库，读走从库、写走主库；
+#   2) 字段加密：敏感列写入自动加密、查询自动解密；
+#   3) 分库分表：sharding.split.enabled=true 后，按每张表自己的 sharding-column 取模自动分库/分表。
+#
+# 两组数据源 ds0 / ds1 的配置完全一致（同一个库，便于本地演示）：
+#   datasource0（组名）: 主库 ds0，从库 ds0slave0
+#   datasource1（组名）: 主库 ds1，从库 ds1slave0
+# 业务表默认落在第一个组（datasource0 -> 主库 ds0）。
+# ============================================================================
+sharding:
+  # 连接池公共参数（所有物理数据源共用）
+  pool:
+    max-active: 20
+    min-idle: 10
+    initial-size: 5
+    max-wait: 10000
+    time-between-eviction-runs-millis: 60000
+    min-evictable-idle-time-millis: 1800000
+    validation-query: SELECT 1
+    test-while-idle: true
+    test-on-borrow: false
+    test-on-return: false
+    log-abandoned: true
+    remove-abandoned: true
+    remove-abandoned-timeout: 300
+
+  # 单表规则：把“哪个组里的哪些表”登记为单表（不做分库分表，所有业务表都归第一个组）。
+  #   datasource0.*.*  = datasource0 组下所有 schema 的所有表
+  # 注意【不要】写成 "*.*"，那会把 ds0 与 ds1 里的同名表都登记成同一张表的多个数据节点，
+  # 路由时会随机落到 ds1，写库就不再固定是 ds0 了。
+  single-tables:
+    - "datasource0.*.*"
+
+  # 分库分表（默认关闭，本项目当前不需要）
+  #   enabled: 总开关，false 时所有表由上面的单表规则托管，只落 datasource0
+  #   tables : 参与分片的表清单，每张表各自声明分片键、分库数、分表数：
+  #       name           : 逻辑表名（必填）
+  #       sharding-column: 分片键（数据库列名），这张表的分库与分表都按它取模
+  #       database-count : 这张表的分库数，1=不分库；>1 时按组顺序占用前 N 个读写分离组
+  #       table-count    : 这张表的分表数，1=不分表；>1 时实际表名为 逻辑表_0 … 逻辑表_(N-1)
+  # 开启示例（t_order 分 2 表、t_tenant 分 2 库，物理表需先建好）：
+  #   enabled: true
+  #   tables:
+  #     - name: t_order
+  #       sharding-column: id
+  #       database-count: 1
+  #       table-count: 2
+  #     - name: t_tenant
+  #       sharding-column: tenant_id
+  #       database-count: 2
+  #       table-count: 1
+  split:
+    enabled: false
+    tables: []
+
+  # 读写分离组
+  datasources:
+    - master-slave-name: datasource0
+      master:
+        name: ds0
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: org.postgresql.Driver
+        jdbcUrl: jdbc:postgresql://localhost:5432/spec_store?options=-c%20timezone%3DAsia%2FShanghai
+        username: root
+        password: 123456
+      slaves:
+        - name: ds0slave0
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: org.postgresql.Driver
+          jdbcUrl: jdbc:postgresql://localhost:5432/spec_store?options=-c%20timezone%3DAsia%2FShanghai
+          username: root
+          password: 123456
+
+    - master-slave-name: datasource1
+      master:
+        name: ds1
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: org.postgresql.Driver
+        jdbcUrl: jdbc:postgresql://localhost:5432/spec_store?options=-c%20timezone%3DAsia%2FShanghai
+        username: root
+        password: 123456
+      slaves:
+        - name: ds1slave0
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: org.postgresql.Driver
+          jdbcUrl: jdbc:postgresql://localhost:5432/spec_store?options=-c%20timezone%3DAsia%2FShanghai
+          username: root
+          password: 123456
+
+  # 字段加密（PostgreSQL：AES/ECB，密文以十六进制字符串落库，列类型 varchar/text）
+  #   algorithm-type: postgresql -> PostgresqlAesEncryptAlgorithm
+  #   如需改为 ShardingSphere 内置 AES（Base64 密文、密钥先经摘要），algorithm-type 改成 AES 并补 digest-algorithm-name
+  encrypt:
+    enabled: true
+    # 生产环境请改为环境变量或 Jasypt 加密后再注入
+    aes-key: SpecStore@2026#AesKey
+    algorithm-type: postgresql
+    tables:
+      t_tenant:
+        - phone
+        - email
+      t_tenant_key:
+        - secret
+
+# 打开 SQL 打印，便于观察路由与加解密
+logging:
+  level:
+    com.nn0101.specstore: debug
+    org.apache.shardingsphere: info
+    org.apache.shardingsphere.sql.parser: warn

@@ -1,0 +1,34 @@
+server:
+  port: 1010
+  servlet:
+    context-path: /spec-store
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  web:
+    resources:
+      add-mappings: true
+  application:
+    name: spec-store-core
+  profiles:
+    active: dev
+
+# Druid 监控页面：http://127.0.0.1:1010/spec-store/druid/index.html
+druid:
+  monitor:
+    enabled: true
+    url-mappings: /druid/*
+    allow: 127.0.0.1
+    deny:
+    login-username: admin
+    login-password: admin
+    reset-enable: false
+    filter:
+      url-patterns: /*
+      exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+
+logging:
+  level:
+    com.nn0101.specstore: info
+    org.apache.shardingsphere: info
