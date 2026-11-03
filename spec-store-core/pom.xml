@@ -32,6 +32,13 @@
         </dependency>
         <!-- Spring Boot Starter End -->
 
+        <!-- TLog Begin -->
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-all-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- TLog End -->
+
         <!-- AOP Begin -->
         <dependency>
             <groupId>org.aspectj</groupId>

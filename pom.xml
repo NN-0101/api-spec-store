@@ -128,6 +128,14 @@
             </dependency>
             <!-- Spring Cloud End -->
 
+            <!-- TLog Begin -->
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>tlog-all-spring-boot-starter</artifactId>
+                <version>${tlog-all-spring-boot-starter.version}</version>
+            </dependency>
+            <!-- TLog End -->
+
             <!-- Aop Begin -->
             <dependency>
                 <groupId>org.aspectj</groupId>
